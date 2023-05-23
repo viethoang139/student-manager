@@ -1,5 +1,6 @@
 package com.leviethoang.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class Account {
     private String username;
     @NotNull(message = "password should not be null")
     @NotEmpty(message = "password should not be empty")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private boolean enabled = true;

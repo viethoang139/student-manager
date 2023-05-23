@@ -21,6 +21,7 @@ public class AccountController {
         return ResponseEntity.ok(service.createUser(account));
     }
 
+
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/admin")
     public ResponseEntity<Account> createAdmin(@RequestBody @Valid Account account){

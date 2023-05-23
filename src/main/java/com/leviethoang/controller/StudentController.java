@@ -45,5 +45,4 @@ public class StudentController {
         return ResponseEntity.accepted().build();
     }
 
-
 }
