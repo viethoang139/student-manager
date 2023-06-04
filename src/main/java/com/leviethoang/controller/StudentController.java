@@ -1,5 +1,6 @@
 package com.leviethoang.controller;
-import com.leviethoang.dto.StudentDto;
+import com.leviethoang.dto.StudentRequest;
+import com.leviethoang.dto.StudentResponse;
 import com.leviethoang.exception.StudentNotFoundException;
 import com.leviethoang.model.Student;
 import com.leviethoang.service.impl.StudentServiceImpl;
@@ -18,24 +19,24 @@ public class StudentController {
     private final StudentServiceImpl service;
 
     @PostMapping
-    public ResponseEntity<Student> create(@RequestBody @Valid Student student){
-        return ResponseEntity.ok(service.create(student));
+    public ResponseEntity<Student> create(@RequestBody @Valid StudentRequest studentRequest){
+        return ResponseEntity.ok(service.create(studentRequest));
     }
 
     @GetMapping
-    public ResponseEntity<List<StudentDto>> findAll(){
+    public ResponseEntity<List<StudentResponse>> findAll(){
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> findById(@PathVariable("id") Integer id) throws StudentNotFoundException {
+    public ResponseEntity<StudentResponse> findById(@PathVariable("id") Integer id) throws StudentNotFoundException {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @PutMapping
-    public ResponseEntity<Student> update(@RequestBody Student student){
-        return ResponseEntity.ok(service.update(student));
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentResponse> update(@RequestBody Student student, @PathVariable("id") Integer studentId) throws StudentNotFoundException {
+        return ResponseEntity.ok(service.update(student,studentId));
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")

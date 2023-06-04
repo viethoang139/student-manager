@@ -1,6 +1,7 @@
 package com.leviethoang.service.impl;
 
-import com.leviethoang.dto.StudentDto;
+import com.leviethoang.dto.StudentRequest;
+import com.leviethoang.dto.StudentResponse;
 import com.leviethoang.exception.StudentNotFoundException;
 import com.leviethoang.model.Student;
 import com.leviethoang.repository.StudentRepository;
@@ -19,37 +20,61 @@ public class StudentServiceImpl implements StudentService {
 
 
     @Override
-    public Student create(Student student) {
+    public Student create(StudentRequest studentRequest) {
+        Student student = Student.builder()
+                .firstname(studentRequest.getFirstname())
+                .lastname(studentRequest.getLastname())
+                .address(studentRequest.getAddress())
+                .email(studentRequest.getEmail())
+                .dob(studentRequest.getDob()).build();
         return studentRepository.save(student);
     }
 
     @Override
-    public List<StudentDto> findAll() {
-        return studentRepository.findAll().stream().map(
-                student -> toStudentDto(student)).collect(Collectors.toList());
+    public List<StudentResponse> findAll() {
+        List<Student> students = studentRepository.findAll();
+        List<StudentResponse> studentResponseList = students.stream().map(this::mapToStudentResponse)
+                .collect(Collectors.toList());
+        return studentResponseList;
+    }
+
+    private StudentResponse mapToStudentResponse(Student student) {
+        StudentResponse studentResponse = new StudentResponse();
+        studentResponse.setFirstname(student.getFirstname());
+        studentResponse.setLastname(student.getLastname());
+        studentResponse.setAddress(student.getAddress());
+        studentResponse.setEmail(student.getEmail());
+        studentResponse.setDob(student.getDob());
+        return studentResponse;
     }
 
     @Override
-    public Student findById(Integer id) throws StudentNotFoundException {
+    public StudentResponse findById(Integer id) throws StudentNotFoundException {
         Optional<Student> optionalStudent = studentRepository.findById(id);
         if(optionalStudent.isPresent()){
-            return optionalStudent.get();
+            Student student = optionalStudent.get();
+            return mapToStudentResponse(student);
         }
         else{
-            throw new StudentNotFoundException("Can not find student with ID: " + id);
+            throw new StudentNotFoundException("Can not found student with ID: " + id);
         }
     }
 
     @Override
-    public Student update(Student student) {
-        Student savedStudent = new Student();
-        savedStudent.setId(student.getId());
-        savedStudent.setFirstname(student.getFirstname());
-        savedStudent.setLastname(student.getLastname());
-        savedStudent.setAddress(student.getAddress());
-        savedStudent.setEmail(student.getEmail());
-        savedStudent.setDob(student.getDob());
-        return studentRepository.save(savedStudent);
+    public StudentResponse update(Student student,Integer id) throws StudentNotFoundException {
+        Optional<Student> optionalStudent = studentRepository.findById(id);
+        if(optionalStudent.isPresent()){
+            StudentResponse studentResponse = new StudentResponse();
+            studentResponse.setFirstname(student.getFirstname());
+            studentResponse.setLastname(student.getLastname());
+            studentResponse.setAddress(student.getAddress());
+            studentResponse.setEmail(student.getEmail());
+            studentResponse.setDob(student.getDob());
+            return mapToStudentResponse(student);
+        }
+        else{
+            throw new StudentNotFoundException("Can not found student with ID: " + id);
+        }
     }
 
     @Override
@@ -62,15 +87,5 @@ public class StudentServiceImpl implements StudentService {
             throw new StudentNotFoundException("Can not find student with ID: " + id);
         }
     }
-
-    public StudentDto toStudentDto(Student student){
-        StudentDto studentDto = new StudentDto();
-        studentDto.setId(student.getId());
-        studentDto.setFirstname(student.getFirstname());
-        studentDto.setLastname(student.getLastname());
-        studentDto.setAddress(student.getAddress());
-        return studentDto;
-    }
-
 
 }
